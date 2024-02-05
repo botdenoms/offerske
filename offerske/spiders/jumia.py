@@ -1,4 +1,5 @@
 import scrapy
+from urllib.request import urljoin
 
 from offerske.items import OfferskeItem
 
@@ -14,9 +15,12 @@ class JumiaSpider(scrapy.Spider):
             for prd in productsurls:
                 yield response.follow(prd, callback=self.product_page_handler)
 
-        # next_page = response.xpath('//ul[@class="pages"]/li[@class="next"]/a')
-        # if next_page:
-        #     yield response.follow(next_page, callback=self.parse)
+        next_url = response.css('a.pg')[5].css('::attr(href)').get()
+        next = urljoin(response.url, next_url)
+        if next != response.url:
+            # yield response.follow(next_page, callback=self.links_log)
+            yield response.follow(next, callback=self.parse)
+
 
     def product_page_handler(self, response):
         item = OfferskeItem()
