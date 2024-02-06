@@ -33,13 +33,15 @@ class JumiaSpider(scrapy.Spider):
         item['left'] = items_left.split(" ")[0]
         item['thumb'] = response.css('div.sldr._img._prod.-rad4.-oh.-mbs').css('a::attr(href)').get()
 
-        item['description'] = response.css('div.markup.-mhm.-pvl.-oxa.-sc *::text').extract()
+        desc_list = response.css('div.markup.-mhm.-pvl.-oxa.-sc *::text').extract()
+        item['description'] = [d.strip() for d in desc_list if len(d) > 2]
         item['images'] = response.css('div.markup.-mhm.-pvl.-oxa.-sc').css('img::attr(src)').extract()
 
         specs = response.css('div.card-b.-fh') # list of items
         if specs and len(specs) == 3:
             item['features'] = specs[0].css('h2::text').get()
-            item['features_items'] = specs[0].css('div.markup.-pam *::text').extract()
+            fts_list = specs[0].css('div.markup.-pam *::text').extract()
+            item['features_items'] = [f.strip() for f in fts_list if len(f.strip()) > 3]
             item['box'] = specs[1].css('h2::text').get()
             item['box_items'] = specs[1].css('div.markup.-pam *::text').extract()
             # 3rd items // specifications
